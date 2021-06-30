@@ -6,7 +6,7 @@
 
 typedef struct{
 
-    int idUsuario;                 // auto incremental
+    int idUsuario;
     char nombre[30];
     char apellido[30];
     char userName[20];
