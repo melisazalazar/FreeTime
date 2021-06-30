@@ -6,7 +6,7 @@
 
 typedef struct{
 
-    int idUsuario;
+    int idUsuario;                 // auto incremental
     char nombre[30];
     char apellido[30];
     char userName[20];
@@ -95,6 +95,7 @@ void menuPrincipal(){
      int menu;
 
      tituloProyecto();
+
      printf("Bienvenido a la Red Social FreeTime\n");
      printf("Elija la opcion correspondiente para ingresar\n");
 
@@ -347,6 +348,8 @@ void menuUsuario(char archivo[], stUsuario usuario){
     int menu;
     int existe;
     int idContenido;
+    int idContenidoModificar;
+    int flag = 0;
 
     do {
         printf("Inicio de sesion correcto\n");
@@ -357,7 +360,8 @@ void menuUsuario(char archivo[], stUsuario usuario){
         printf("4) crear mensajes\n");
         printf("5) Ver mensajes\n");
         printf("6) Ver mi perfil\n");//ya esta
-        printf("7) Salir\n");
+        printf("7) Modificar contenido\n");
+        printf("8) Salir\n");
         scanf("%d", &menu);
 
         switch(menu){
@@ -393,6 +397,25 @@ void menuUsuario(char archivo[], stUsuario usuario){
             muestraUnUsuario(usuario);
             break;
         case 7:
+            system("cls");
+            printf("Ingrese el Id del contenido a modificar: ");
+            scanf("%d", &idContenidoModificar);
+
+            for(int i = 0; i < usuario.validosContenidos; i++){
+                   if(usuario.listadoIdsContenidosGuardados[i] == idContenidoModificar) {
+                        flag = 1;
+
+                   }
+
+            }
+            if(flag == 1){
+                modificaContenido("contenidos.dat", idContenidoModificar);
+
+            }
+
+
+            break;
+        case 8:
             control = 'n';
             break;
         default:
@@ -765,8 +788,6 @@ void muestraTodosLosContenidoDeUnUsuario(char archivoContenido[], stUsuario usua
 
     if(bufferArchivo!=NULL){
         while(fread(&contenido, sizeof(stContenido),1, bufferArchivo) > 0 ){
-            printf("Id contenido: %d \n", contenido.idContenido);
-
             for(int i = 0; i < usuario.validosContenidos; i++){
                 if(usuario.listadoIdsContenidosGuardados[i] == contenido.idContenido){
                    muestraUnContenido(contenido);
@@ -820,4 +841,79 @@ stUsuario actualizarArregloContenido(char archivo[], stUsuario usuario, int idCo
     fclose(bufferArchivo);
 
     return usuario;
+}
+
+void modificaContenido(char archivoContenido[], int idContenido){
+    system("cls");
+    stContenido contenidoActualizado;
+    char titulo[30];
+    char descripcion[300];
+    char categoria[30];
+    char control = 's';
+    int menu;
+    int pos;
+
+    FILE * bufferArchivo = fopen(archivoContenido, "r+b");
+
+      if(bufferArchivo){
+        pos = buscaPosicionContenido(archivoContenido, idContenido);
+
+
+
+        do{
+            fseek(bufferArchivo, sizeof(stContenido) * pos, SEEK_SET);
+            fread(&contenidoActualizado, sizeof(stContenido), 1, bufferArchivo);
+            muestraUnContenido(contenidoActualizado);
+            printf("Menu de modificacion\n");
+            printf("1)Titulo\n");
+            printf("2)Descripcion\n");
+            printf("3)Categoria\n");
+            scanf("%d", &menu);
+
+            switch(menu){
+            case 1:
+                printf("Escribi el nuevo Titulo\n");
+                fflush(stdin);
+                gets(titulo);
+                strcpy(contenidoActualizado.titulo, titulo);
+                fseek(bufferArchivo, (-1) * sizeof(stContenido), SEEK_CUR);
+                fwrite(&contenidoActualizado, sizeof(stContenido), 1, bufferArchivo);
+                printf("Contenido actualizado \n");
+                muestraUnContenido(contenidoActualizado);
+                break;
+            }
+
+            printf("\nDesea hacer otro cambio ? s/n\n ");
+            fflush(stdin);
+            control= getch();
+            system("cls");
+
+        }while(control == 's');
+    }
+    fclose(bufferArchivo);
+
+
+}
+
+int buscaPosicionContenido(char archivo[], int idContenido) {
+    int pos = 0;
+    int flag = 0;
+    stContenido contenido;
+
+
+    FILE * bufferArchivo = fopen(archivo, "rb");
+
+    if(bufferArchivo){
+        while(!feof(bufferArchivo)&& flag == 0){
+            if(fread(&contenido, sizeof(stContenido), 1, bufferArchivo) > 0){
+                if(contenido.idContenido == idContenido) {
+                    pos = ftell(bufferArchivo)/sizeof(contenido)-1;
+                    flag = 1;
+                }
+            }
+        }
+        fclose(bufferArchivo);
+    }
+
+    return pos;
 }
