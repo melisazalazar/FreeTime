@@ -347,6 +347,8 @@ void menuUsuario(char archivo[], stUsuario usuario){
     int flag = 0;
     char buscaUsuario[30];
     int existeUser;
+    char buscaCategoria[30];
+    int existeCate;
 
     do {
         printf("Inicio de sesion correcto\n");
@@ -359,7 +361,7 @@ void menuUsuario(char archivo[], stUsuario usuario){
         printf("6) Ver mi perfil\n");//ya esta
         printf("7) Modificar contenido\n");//ya esta
         printf("8) Buscar un usuario\n");
-        printf("9) Buscar un contenido\n");
+        printf("9) Buscar Contenido por Categoria\n");
         printf("10) Salir\n");
         scanf("%d", &menu);
 
@@ -433,6 +435,26 @@ void menuUsuario(char archivo[], stUsuario usuario){
             getchar();
             system("cls");
             break;
+        case 9:
+            system("cls");
+            printf("Que categoria desea buscar?\n");
+            fflush(stdin);
+            gets(buscaCategoria);
+            existeCate = existecategoria("contenidos.dat", buscaCategoria);
+            if(existeCate == 1){
+                system("cls");
+                printf("hay categorias\n");
+
+               muestraContenidosPorCategoria("contenidos.dat", buscaCategoria);
+
+            }else{
+
+                printf("No existen categorias de: %s\n", buscaCategoria);
+
+            }
+            break;
+
+
 
         case 10:
 
@@ -972,4 +994,39 @@ int buscaPosicionContenido(char archivo[], int idContenido) {
     }
 
     return pos;
+}
+int existecategoria(char archivoContenido[], char categoria[]){
+    stContenido contenido;
+    int flag = 0;
+
+    FILE * bufferArchivo = fopen(archivoContenido, "rb");
+    if(bufferArchivo!=NULL){
+
+        while(flag == 0 && fread(&contenido, sizeof(stContenido),1, bufferArchivo) > 0 ){
+
+            if(strcmp(contenido.categoria, categoria)== 0){
+                flag = 1;
+
+            }
+        }
+
+        fclose(bufferArchivo);
+        }
+
+    return flag;
+}
+void muestraContenidosPorCategoria(char archivoContenido[], char categoria[]){
+    stContenido contenido;
+    FILE * bufferArchivo = fopen(archivoContenido, "rb");
+
+    if(bufferArchivo){
+        while(fread(&contenido, sizeof(stContenido), 1, bufferArchivo) > 0){
+                if(strcmp(contenido.categoria, categoria) == 0){
+                    muestraUnContenido(contenido);
+
+                }
+        }
+    }
+    fclose(bufferArchivo);
+
 }
