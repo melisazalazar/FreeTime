@@ -868,6 +868,7 @@ void modificaContenido(char archivoContenido[], int idContenido){
             printf("1)Titulo\n");
             printf("2)Descripcion\n");
             printf("3)Categoria\n");
+            printf("4)Dar de baja el contenido\n");
             scanf("%d", &menu);
 
             switch(menu){
@@ -876,6 +877,26 @@ void modificaContenido(char archivoContenido[], int idContenido){
                 fflush(stdin);
                 gets(titulo);
                 strcpy(contenidoActualizado.titulo, titulo);
+                fseek(bufferArchivo, (-1) * sizeof(stContenido), SEEK_CUR);
+                fwrite(&contenidoActualizado, sizeof(stContenido), 1, bufferArchivo);
+                printf("Contenido actualizado \n");
+                muestraUnContenido(contenidoActualizado);
+                break;
+            case 2:
+                printf("Escribi la nueva descripcion\n");
+                fflush(stdin);
+                gets(descripcion);
+                strcpy(contenidoActualizado.descripcion, descripcion);
+                fseek(bufferArchivo, (-1) * sizeof(stContenido), SEEK_CUR);
+                fwrite(&contenidoActualizado, sizeof(stContenido), 1, bufferArchivo);
+                printf("Contenido actualizado \n");
+                muestraUnContenido(contenidoActualizado);
+                break;
+            case 3:
+                printf("Escribi la nueva Categoria\n");
+                fflush(stdin);
+                gets(categoria);
+                strcpy(contenidoActualizado.categoria, categoria);
                 fseek(bufferArchivo, (-1) * sizeof(stContenido), SEEK_CUR);
                 fwrite(&contenidoActualizado, sizeof(stContenido), 1, bufferArchivo);
                 printf("Contenido actualizado \n");
