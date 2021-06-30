@@ -102,8 +102,6 @@ void menuPrincipal(){
      do{
         printf("1)Ingresar como usuario\n");
         printf("2)Ingresar como administrador\n");
-        printf("3)  SOLO MUESTRA EL ARCHIVO USUARIO BORRAR\n");
-        printf("4)  SOLO MUESTRA EL ARCHIVO CONTENIDO BORRAR\n");
         scanf("%d", &menu);
 
         switch(menu){
@@ -111,16 +109,13 @@ void menuPrincipal(){
             usuarioInicio();
             break;
         case 2:
-            printf("En construccion");
-            break;
-        case 3:
             printf("SOLO MUESTRA EL ARCHIVO usuario\n");
             muestraUsuarioArchivo("usuarios.dat");
-            break;
-        case 4:
             printf("solo muestra archivo contenido\n");
             muestraContenidoArchivo("contenidos.dat");
+
             break;
+
         }
 
         printf("\nDesea continuar en el programa? s/n\n ");
@@ -350,6 +345,8 @@ void menuUsuario(char archivo[], stUsuario usuario){
     int idContenido;
     int idContenidoModificar;
     int flag = 0;
+    char buscaUsuario[30];
+    int existeUser;
 
     do {
         printf("Inicio de sesion correcto\n");
@@ -360,8 +357,10 @@ void menuUsuario(char archivo[], stUsuario usuario){
         printf("4) crear mensajes\n");
         printf("5) Ver mensajes\n");
         printf("6) Ver mi perfil\n");//ya esta
-        printf("7) Modificar contenido\n");
-        printf("8) Salir\n");
+        printf("7) Modificar contenido\n");//ya esta
+        printf("8) Buscar un usuario\n");
+        printf("9) Buscar un contenido\n");
+        printf("10) Salir\n");
         scanf("%d", &menu);
 
         switch(menu){
@@ -413,9 +412,30 @@ void menuUsuario(char archivo[], stUsuario usuario){
 
             }
 
-
             break;
         case 8:
+            system("cls");
+            printf("Que usuario desea buscar?\n");
+            fflush(stdin);
+            gets(buscaUsuario);
+            existeUser = existeUserPorUserName("usuarios.dat", buscaUsuario);
+            if(existeUser == 1){
+                system("cls");
+
+                usuario = buscaUserPorUserName("usuarios.dat", buscaUsuario);
+                muestraUnUsuario(usuario);
+            }else{
+
+                printf("usuario a buscar %s no existe\n", buscaUsuario);
+
+            }
+            printf("\nPrecione una tecla para continuar\n");
+            getchar();
+            system("cls");
+            break;
+
+        case 10:
+
             control = 'n';
             break;
         default:
@@ -778,7 +798,7 @@ void muestraUnContenido(stContenido contenido){
     printf("\n  Categoria               : %s", contenido.categoria);
     printf("\n  Likes                   : %d", contenido.likes);
     printf("\n  Puntos Por Compartir    : %d", contenido.puntosPorCompartir);
-    printf("\n  Activos                 : %d", contenido.activo);
+    printf("\n  Activo                  : %d", contenido.activo);
     printf("\n  -----------------------------------------------------------------\n");
 }
 void muestraTodosLosContenidoDeUnUsuario(char archivoContenido[], stUsuario usuario){
@@ -852,6 +872,7 @@ void modificaContenido(char archivoContenido[], int idContenido){
     char control = 's';
     int menu;
     int pos;
+   char baja = 'n';
 
     FILE * bufferArchivo = fopen(archivoContenido, "r+b");
 
@@ -901,6 +922,20 @@ void modificaContenido(char archivoContenido[], int idContenido){
                 fwrite(&contenidoActualizado, sizeof(stContenido), 1, bufferArchivo);
                 printf("Contenido actualizado \n");
                 muestraUnContenido(contenidoActualizado);
+                break;
+            case 4:
+                printf("Esta seguro de dar de baja al contenido presione (s/n)\n");
+                fflush(stdin);
+                scanf("%c", &baja);
+                if(baja == 's'){
+                    contenidoActualizado.activo = 0;
+                    fseek(bufferArchivo, (-1) * sizeof(stContenido), SEEK_CUR);
+                    fwrite(&contenidoActualizado, sizeof(stContenido), 1, bufferArchivo);
+                    printf("Contenido actualizado \n");
+                    muestraUnContenido(contenidoActualizado);
+
+                }
+
                 break;
             }
 
